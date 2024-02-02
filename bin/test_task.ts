@@ -1,21 +1,31 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { TestTaskStack } from '../lib/test_task-stack';
+import { CloudFrontStack } from '../lib/cloudfront-stack';
+import { BackendStack } from '../lib/backend-stack';
+import { S3Stack } from '../lib/s3-stack';
+import { VpcStack } from '../lib/vpc-stack';
+import { DataBaseStack } from '../lib/rds-stack';
 
 const app = new cdk.App();
-new TestTaskStack(app, 'TestTaskStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
-
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
-
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
-
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+const stackS3 = new S3Stack(app, "TestTaskS3Stack", {
+  env: { region: "us-east-2" },
+});
+const stackVpc = new VpcStack(app, "TestTaskVPCStack", {
+  env: { region: "us-east-2" },
+});
+const stackRDS = new DataBaseStack(app, "TestTaskRDSStack", {
+  env: { region: "us-east-2" },
+  vpc: stackVpc.vpc
+});
+const stackCloudFront = new CloudFrontStack(
+  app,
+  "TestTaskCloudFrontStack",
+  {
+    env: { region: "us-east-2" },
+    s3Stack: stackS3
+  }
+);
+const stackBackend = new BackendStack(app, "TestTaskBackendStack", {
+  env: { region: "us-east-2" }
 });
