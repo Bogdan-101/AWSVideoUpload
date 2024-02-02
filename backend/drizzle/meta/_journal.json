@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1706884080372,
+      "tag": "0000_short_morlocks",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1706884341577,
+      "tag": "0001_safe_sway",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1706884759424,
+      "tag": "0002_demonic_skreet",
+      "breakpoints": true
+    }
+  ]
+}
