@@ -27,5 +27,6 @@ const stackCloudFront = new CloudFrontStack(
   }
 );
 const stackBackend = new BackendStack(app, "TestTaskBackendStack", {
-  env: { region: "us-east-2" }
+  env: { region: "us-east-2" },
+  VideoBucket: stackS3.lambdaOutputBucket,
 });

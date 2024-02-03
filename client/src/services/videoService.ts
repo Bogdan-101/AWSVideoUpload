@@ -22,7 +22,7 @@ class VideosService {
 
   constructor() {
     this.axios = axios.create({
-      baseURL: `${import.meta.env.VITE_API_URL}/videos`,
+      baseURL: `https://bytcsdy3m8.execute-api.us-east-2.amazonaws.com/prod`,
     });
   }
 

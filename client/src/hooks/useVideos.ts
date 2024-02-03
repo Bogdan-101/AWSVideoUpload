@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Video, videosService } from "../services/VideosService.ts";
+import { Video, videosService } from "../services/videoService";
 
 export const useVideos = () => {
   const [userVideos, setUserVideos] = useState<Video[]>([]);

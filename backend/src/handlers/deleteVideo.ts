@@ -3,6 +3,7 @@ import { databaseService } from "../services/database.service";
 import { videosService } from "../services/videos.service";
 import Joi from "joi";
 import { validate } from "../utils/validation";
+import { validateToken } from "../utils/user";
 
 const idSchema = Joi.object({
   id: Joi.string().uuid().required(),
@@ -14,6 +15,9 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+  
+  const jwtToken = event.headers["auth"]?.split(" ")[1] as string;
+  const user = validateToken(jwtToken);
 
   const videoId = event.queryStringParameters && event.queryStringParameters["id"];
   validate({ id: videoId }).withSchema(idSchema);
@@ -21,7 +25,7 @@ export const handler = async (
   await databaseService.connect();
 
   //@ts-ignore
-  await videosService.deleteVideo({ id: videoId });
+  await videosService.deleteVideo({ id: videoId, userid: user.id });
 
   return {
     statusCode: 200,

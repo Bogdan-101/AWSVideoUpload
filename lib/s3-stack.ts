@@ -2,6 +2,8 @@
 import * as cdk from "aws-cdk-lib/core";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import * as lambdaEventSources from "aws-cdk-lib/aws-lambda-event-sources";
 
 export interface S3StackProps extends cdk.StackProps {
   // Add custom stack properties here if needed
@@ -25,7 +27,46 @@ export class S3Stack extends cdk.Stack {
     this.lambdaOutputBucket = new s3.Bucket(this, "VideosBucket", {
       autoDeleteObjects: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      cors: [
+        {
+          allowedMethods: [
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.GET,
+            s3.HttpMethods.POST,
+          ],
+          allowedOrigins: ["*"],
+          allowedHeaders: ["*"],
+        },
+      ],
     });
+
+
+    const envs = {
+      DB_HOST:
+        "testtaskrdsstack-db1de0c8f27-8wqwkxijqosw.cd0a8ei2i224.us-east-2.rds.amazonaws.com",
+      DB_USER: "postgres",
+      DB_PASSWORD: "j4281kHqGT3xz6BfUTW0hsACL9gKv9u1",
+      DB_PORT: "5432",
+      DB_DATABASE: "videos",
+      APP_AWS_REGION: "us-east-2",
+      S3_BUCKET_NAME: this.lambdaOutputBucket.bucketName,
+    };
+
+    const uploadVideoFunction = new NodejsFunction(this, "upload", {
+      entry: "backend/src/handlers/uploadVideo.ts",
+      handler: "index.handler",
+      environment: envs,
+    });
+
+    const s3PutEventSource = new lambdaEventSources.S3EventSource(
+     this.lambdaOutputBucket,
+      {
+        events: [s3.EventType.OBJECT_CREATED],
+        filters: [{suffix: '.mp4'}]
+      }
+    );
+
+    uploadVideoFunction.addEventSource(s3PutEventSource);
 
     new cdk.CfnOutput(this, "CloudFrontBucketName", {
       value: this.appBucket.bucketName,
