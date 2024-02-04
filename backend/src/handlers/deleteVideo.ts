@@ -32,5 +32,10 @@ export const handler = async (
     body: JSON.stringify({
       result: true,
     }),
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+    },
   };
 };
