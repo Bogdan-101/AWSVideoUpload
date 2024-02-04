@@ -6,7 +6,7 @@ import {
 } from "drizzle-orm/node-postgres";
 import * as schema from "../schema";
 import { eq } from "drizzle-orm";
-import { GetObjectCommand, GetObjectCommandInput, PutObjectCommand, PutObjectCommandInput, S3, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectCommandInput, GetObjectCommand, GetObjectCommandInput, HeadObjectCommand, HeadObjectCommandInput, PutObjectCommand, PutObjectCommandInput, S3, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 require("dotenv").config();
@@ -20,14 +20,16 @@ export class S3Service {
     this.s3client = new S3Client({ region: process.env.APP_AWS_REGION });
   }
 
-  async getPreSignedURL(description: string, uploaderId: string) {
+  async getPreSignedURL(title: string, description: string, duration: string, uploaderId: string) {
     try {
       const putObjectParams: PutObjectCommandInput = {
         Bucket: this.s3BucketName,
         Key: `videos/${Date.now()}-${Math.random()}.mp4`,
         ContentType: "video/mp4",
         Metadata: {
+          title,
           description,
+          duration,
           uploaderId
         }
       };
@@ -38,6 +40,22 @@ export class S3Service {
       console.error("Error generating pre-signed URL", err);
       return null;
     }
+  }
+
+  async getObjectMetaData(key: string) {
+    const params: HeadObjectCommandInput = {Bucket: this.s3BucketName, Key: key};
+    const command = new HeadObjectCommand(params);
+    const metaData = await this.s3client.send(command)
+    return metaData.Metadata;
+  }
+
+  async deleteVideo({ key }: { key: string }) {
+    const params: DeleteObjectCommandInput = {
+      Bucket: this.s3BucketName,
+      Key: key,
+    };
+    const command = new DeleteObjectCommand(params);
+    await this.s3client.send(command);
   }
 }
 

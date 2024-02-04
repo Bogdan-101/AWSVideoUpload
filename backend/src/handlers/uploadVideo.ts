@@ -1,65 +1,42 @@
-import { Context, APIGatewayProxyResult, APIGatewayEvent } from "aws-lambda";
+import { Context, APIGatewayProxyResult, APIGatewayEvent, S3Event } from "aws-lambda";
 import { databaseService } from "../services/database.service";
 import { videosService } from "../services/videos.service";
-import { ContainerTypes, ValidatedRequestSchema, createValidator } from "express-joi-validation";
-import Joi from "joi";
-import { validate } from "../utils/validation";
-import { exec } from "child_process";
-
-const validator = createValidator();
-
-const paginationSchema = Joi.object({
-  limit: Joi.number().default(25),
-  offset: Joi.number().default(0),
-});
-
-const idSchema = Joi.object({
-  id: Joi.string().uuid().required(),
-});
-
-const uploadSchema = Joi.object({
-  name: Joi.string().required(),
-  description: Joi.string().required()
-});
-
-interface PaginationSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: {
-    limit: number;
-    offset: number;
-  };
-}
-
-interface IdSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Params]: {
-    id: string;
-  };
-}
+import { s3Service } from "../services/s3.service";
+require("dotenv").config();
 
 export const handler = async (
-  event: APIGatewayEvent,
+  event: S3Event,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`request context: ${JSON.stringify(event.requestContext, null, 2)}`);
-  console.log(
-    `resource: ${JSON.stringify(event.resource, null, 2)}`
-  );
-  console.log(`body: ${JSON.stringify(event.body, null, 2)}`);
+  const body = event.Records[0];
+  const url = `https://${body.s3.bucket.name}.s3.${process.env["APP_AWS_REGION"]}.amazonaws.com/${body.s3.object.key}`;
+  const objectMetadata = await s3Service.getObjectMetaData(body.s3.object.key);
 
-  const { name, description, uploaderId } = JSON.parse(event.body ?? '{}');
-  const body = {
-    name, description, uploaderId
+  if (!objectMetadata) {
+    console.log("TEST: error, no object metadata", objectMetadata);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'No metadata was found',
+      }),
+    };
   }
-  validate(body).withSchema(uploadSchema);
-
   await databaseService.connect();
 
-  // const newVideo = await videosService.uploadVideo(body, '');
+  const newVideo = await videosService.uploadVideo({
+    name: objectMetadata["title"],
+    description: objectMetadata["description"],
+    duration: Math.floor(+objectMetadata["duration"]),
+    uploaderId: objectMetadata["uploaderid"],
+    key: body.s3.object.key,
+    url,
+  });
 
   return {
     statusCode: 200,
     body: JSON.stringify({
-      newVideo: ''
+      newVideo
     }),
   };
 };

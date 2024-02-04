@@ -1,4 +1,4 @@
-import { boolean, date, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import "dotenv/config";
 import { relations } from "drizzle-orm";
 import { users } from "./users";
@@ -8,6 +8,9 @@ export const videos = pgTable("videos", {
   name: varchar("name", { length: 255 }).notNull(),
   uploaderId: varchar("uploaderId", { length: 255 }).notNull(),
   description: varchar("description", { length: 255 }).notNull(),
+  duration: integer("duration").notNull(),
+  key: varchar("key", { length: 255 }).notNull(),
+  url: varchar("url", { length: 255 }).notNull(),
   createdAt: date("created_at").defaultNow(),
   updatedAt: date("updated_at").defaultNow(),
   deletedAt: date("deleted_at").defaultNow(),

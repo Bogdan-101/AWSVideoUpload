@@ -3,18 +3,21 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface Video {
   id: string;
-  title: string;
-  fileName: string;
-  description?: string;
-  duration?: number;
+  name: string;
+  description: string;
+  duration: number;
+  url: string;
   createdAt: string;
-  authorId: string;
+  updatedAt: string;
+  deletedAt: string;
+  uploaderId: string;
 }
 
 export interface VideoFormValues {
   title: string;
   description: string;
-  video: File;
+  video: Blob;
+  duration: number;
 }
 
 class VideosService {
@@ -26,46 +29,63 @@ class VideosService {
     });
   }
 
-  async getVideos(): Promise<{ videos: Video[]; count: number }> {
-    const { data } = await this.axios.get<{ videos: Video[]; count: number }>(
-      "/",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  async getVideos(): Promise<{ result: Video[] }> {
+    const { data } = await this.axios.get<{ result: Video[] }>("/getVideos", {
+      headers: {
+        auth: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     return data;
   }
 
-  async uploadVideo(
-    { title, description, video }: VideoFormValues,
-    setProgress: Dispatch<SetStateAction<number>>
-  ): Promise<void> {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("video", video);
+  // TODO: check setProgess type here
+  async uploadVideo({ title, description, video, duration }: VideoFormValues, setProgress: { (value: SetStateAction<number>): void; (arg0: number): void; }) {
+    // TODO: add progress here
+    try {
+      const uploadURL = await this.getPreSignedURL(
+        title,
+        description,
+        duration
+      );
 
-    await this.axios.post("/upload", formData, {
+      const formData = new FormData();
+      formData.append("file", video);
+      
+      const response = await fetch(uploadURL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "video/mp4",
+        },
+        body: video,
+      });
+
+      if (response.ok) {
+        setProgress(100);
+        console.log("Upload successful");
+      } else {
+        console.error("Upload failed");
+      }
+      return response;
+    } catch (error) {
+      console.error("Error uploading video:", error);
+    }
+  }
+
+  async getPreSignedURL(title: string, description: string, duration: number) {
+    const { data } = await this.axios.get<{ uploadURL: string }>(`/uploadURL?title=${title}&description=${description}&duration=${duration}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "multipart/form-data",
-      },
-      onUploadProgress(progressEvent) {
-        if (progressEvent.total)
-          setProgress(
-            Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          );
+        auth: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+
+    return data.uploadURL;
   }
 
   async deleteVideo(id: string): Promise<void> {
-    const { data } = await this.axios.delete(`/${id}`, {
+    const { data } = await this.axios.delete(`/delete?id=${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        auth: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 

@@ -77,10 +77,18 @@ export class BackendStack extends cdk.Stack {
     const apigw = new apigateway.RestApi(this, "apigw", {
       description: "An API Gateway for routing video processing functions",
       defaultCorsPreflightOptions: {
-        allowHeaders: ["*"],
-        allowMethods: ["*"],
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: [
+          "Content-Type",
+          "Authorization",
+          "X-Amz-Date",
+          "X-Api-Key",
+          "X-Amz-Security-Token",
+          "X-Amz-User-Agent",
+          "auth"
+        ],
         allowCredentials: true,
-        allowOrigins: ["*"],
       },
     });
 
@@ -118,13 +126,19 @@ export class BackendStack extends cdk.Stack {
     //   new apigateway.LambdaIntegration(uploadVideoFunction)
     // );
 
-    // POST uploadURL
+    // GET uploadURL
     const uploadURLLambdaPath = apigw.root.addResource("uploadURL");
     // path name https://{createdId}.execute-api.{region}.amazonaws.com/prod/uploadURL
 
     uploadURLLambdaPath.addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(uploadURLFunction)
+      "GET",
+      new apigateway.LambdaIntegration(uploadURLFunction),
+      {
+        requestParameters: {
+          "method.request.querystring.title": true,
+          "method.request.querystring.description": true,
+        },
+      }
     );
 
     // DELETE delete

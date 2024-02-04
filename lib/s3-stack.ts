@@ -38,6 +38,7 @@ export class S3Stack extends cdk.Stack {
           allowedHeaders: ["*"],
         },
       ],
+      publicReadAccess: true,
     });
 
 
@@ -67,6 +68,8 @@ export class S3Stack extends cdk.Stack {
     );
 
     uploadVideoFunction.addEventSource(s3PutEventSource);
+
+    this.lambdaOutputBucket.grantReadWrite(uploadVideoFunction);
 
     new cdk.CfnOutput(this, "CloudFrontBucketName", {
       value: this.appBucket.bucketName,

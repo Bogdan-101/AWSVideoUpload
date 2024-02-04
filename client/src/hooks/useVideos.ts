@@ -11,7 +11,7 @@ export const useVideos = () => {
     setError("");
     videosService
       .getVideos()
-      .then(({ videos }) => {
+      .then(({ result: videos }) => {
         setUserVideos(videos);
       })
       .catch((e) => {
@@ -23,5 +23,9 @@ export const useVideos = () => {
       });
   }, []);
 
-  return { videos: userVideos, isLoading, error };
+  const deleteById = (id: string) => {
+    setUserVideos(userVideos.filter((video) => video.id !== id));
+  };
+
+  return { videos: userVideos, isLoading, error, deleteById };
 };

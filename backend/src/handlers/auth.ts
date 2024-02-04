@@ -17,32 +17,37 @@ export const handler = async (
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
 
   try {
-      const { username, password } = JSON.parse(event.body ?? "{}");
-      validate({ username, password }).withSchema(registerSchema);
-    
-      await databaseService.connect();
-    
-      //@ts-ignore
-      const token = await databaseService.authenticate({ username, password });
-    
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          token,
-        }),
-        headers: {
-          "Access-Control-Allow-Headers": "*",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-        },
-      };
+    const { username, password } = JSON.parse(event.body ?? "{}");
+    validate({ username, password }).withSchema(registerSchema);
+
+    await databaseService.connect();
+
+    //@ts-ignore
+    const token = await databaseService.authenticate({ username, password });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        token,
+      }),
+      headers: {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+      },
+    };
   } catch (error) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "An error occureed",
-          error: error.message
-        }),
-      };
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "An error occureed",
+        error: error.message,
+      }),
+      headers: {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+      },
+    };
   }
 };

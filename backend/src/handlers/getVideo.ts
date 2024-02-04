@@ -15,17 +15,18 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-  
+
   const jwtToken = event.headers["auth"]?.split(" ")[1] as string;
   const user = validateToken(jwtToken);
 
-  const videoId = event.queryStringParameters && event.queryStringParameters['id'];
-  validate({id: videoId}).withSchema(idSchema);
-  
+  const videoId =
+    event.queryStringParameters && event.queryStringParameters["id"];
+  validate({ id: videoId }).withSchema(idSchema);
+
   await databaseService.connect();
 
   //@ts-ignore
-  const video = await videosService.getVideo({id: videoId});
+  const video = await videosService.getVideo({ id: videoId });
 
   return {
     statusCode: 200,
@@ -35,7 +36,7 @@ export const handler = async (
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
     },
   };
 };

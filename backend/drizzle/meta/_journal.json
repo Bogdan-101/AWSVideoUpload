@@ -22,6 +22,34 @@
       "when": 1706884759424,
       "tag": "0002_demonic_skreet",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1707065937774,
+      "tag": "0003_aberrant_spirit",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1707070968482,
+      "tag": "0004_grey_spencer_smythe",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1707070997243,
+      "tag": "0005_orange_devos",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1707071038622,
+      "tag": "0006_slippery_photon",
+      "breakpoints": true
     }
   ]
 }
