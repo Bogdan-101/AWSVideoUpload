@@ -1,8 +1,8 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from "aws-lambda";
 import { databaseService } from "../services/database.service";
-import { videosService } from "../services/videos.service";
 import { validate } from "../utils/validation";
 import Joi from "joi";
+import { CustomError } from "../utils/customError";
 
 const registerSchema = Joi.object({
   username: Joi.string().required(),
@@ -37,11 +37,27 @@ export const handler = async (
       },
     };
   } catch (error) {
+    if (error instanceof CustomError) {
+      return {
+        statusCode: error.statusCode,
+        body: JSON.stringify({
+          message: error.message,
+        }),
+        headers: {
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+        },
+      };
+    }
+      console.log(
+        "An error appeared while processing the auth request, see the logs.",
+        error
+      );
     return {
-      statusCode: 400,
+      statusCode: 5090,
       body: JSON.stringify({
-        message: "An error occureed",
-        error: error.message,
+        message: "An error appeared while processing the auth request, see the logs.",
       }),
       headers: {
         "Access-Control-Allow-Headers": "*",

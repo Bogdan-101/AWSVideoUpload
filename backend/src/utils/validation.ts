@@ -1,15 +1,13 @@
 import Joi from "joi";
+import { CustomError } from "./customError";
 
 export const validate = (input: any) => {
   return {
     withSchema: (schema: Joi.ObjectSchema<any>) => {
       const validation = schema.validate(input);
       if (validation.error) {
-        return {
-          statusCode: 400,
-          body: validation.value,
-        };
+        throw new CustomError(422, validation.error.message)
       }
-    },
-  };
+    }
+  }
 }

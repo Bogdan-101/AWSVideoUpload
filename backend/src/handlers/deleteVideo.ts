@@ -4,6 +4,7 @@ import { videosService } from "../services/videos.service";
 import Joi from "joi";
 import { validate } from "../utils/validation";
 import { validateToken } from "../utils/user";
+import { CustomError } from "../utils/customError";
 
 const idSchema = Joi.object({
   id: Joi.string().uuid().required(),
@@ -41,11 +42,28 @@ export const handler = async (
       },
     };
   } catch (error) {
-    console.log("TEST: error message in delete handler", error);
+    if (error instanceof CustomError) {
+      return {
+        statusCode: error.statusCode,
+        body: JSON.stringify({
+          message: error.message,
+        }),
+        headers: {
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+        },
+      };
+    }
+      console.log(
+        "An error appeared while processing the deleteVideo request, see the logs.",
+        error
+      );
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: JSON.stringify({
-        message: error.message,
+        message:
+          "An error appeared while processing the deleteVideo request, see the logs.",
       }),
       headers: {
         "Access-Control-Allow-Headers": "*",

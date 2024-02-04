@@ -1,5 +1,7 @@
 import axios, { Axios } from "axios";
 import { Dispatch, SetStateAction } from "react";
+import { Bounce, toast } from "react-toastify";
+import { toasting } from "../utils/toast";
 
 export interface Video {
   id: string;
@@ -48,9 +50,6 @@ class VideosService {
         description,
         duration
       );
-
-      const formData = new FormData();
-      formData.append("file", video);
       
       const response = await fetch(uploadURL, {
         method: "PUT",
@@ -62,9 +61,10 @@ class VideosService {
 
       if (response.ok) {
         setProgress(100);
-        console.log("Upload successful");
+        toasting.success("Video is uploaded 🚀 Don't forget to re-fetch the videos!");
       } else {
-        console.error("Upload failed");
+        console.error("Upload failed", response);
+        toasting.error("Could not upload a video, try again later.");
       }
       return response;
     } catch (error) {

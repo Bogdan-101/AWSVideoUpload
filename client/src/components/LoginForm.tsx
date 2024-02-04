@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, Row, Col, Card } from "antd";
+import { Form, Input, Button, Typography, Row, Col, Card, Spin } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { authService, LoginFormValues } from "../services/authService";
 
@@ -8,17 +8,18 @@ const { Title, Text } = Typography;
 
 export const LoginForm = ({ mode }: { mode: "login" | "signup" }) => {
   const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const isLogin = mode === "login";
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
-      console.log("TEST: on submit")
+      setIsLoading(true);
       await authService[isLogin ? "login" : "signUp"](values);
       navigate("/videos");
     } catch (e: any) {
+      setIsLoading(false);
       console.log("TEST: error on submit", e);
-      // Assuming `e` has a `response.data.message` structure. Adjust as needed.
       const errorMessage = e?.response?.data?.message ?? e.message;
       form.setFields([
         {
@@ -51,7 +52,7 @@ export const LoginForm = ({ mode }: { mode: "login" | "signup" }) => {
                 { max: 32, message: "Must be under 32 symbols" },
               ]}
             >
-              <Input placeholder="Enter your username" />
+              <Input disabled={isLoading} placeholder="Enter your username" />
             </Form.Item>
 
             <Form.Item
@@ -64,6 +65,7 @@ export const LoginForm = ({ mode }: { mode: "login" | "signup" }) => {
               ]}
             >
               <Input.Password
+                disabled={isLoading}
                 placeholder="Enter your password"
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -76,13 +78,9 @@ export const LoginForm = ({ mode }: { mode: "login" | "signup" }) => {
                 type="primary"
                 htmlType="submit"
                 block
-                loading={
-                  form.isFieldsTouched(true) &&
-                  form.getFieldsError().filter(({ errors }) => errors.length)
-                    .length > 0
-                }
+                loading={isLoading}
               >
-                {isLogin ? "Login" : "Sign Up"}
+                {isLogin? "Login": "Sign Up"}
               </Button>
             </Form.Item>
 

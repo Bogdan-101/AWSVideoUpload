@@ -48,10 +48,9 @@
 //           </Upload>
 //         </Form.Item>
 //     </Form>
-    
+
 //   );
 // };
-
 
 // import React from "react";
 // import "react-dropzone-uploader/dist/styles.css";
@@ -90,12 +89,15 @@
 
 import React, { FormEvent, useState } from "react";
 import { videosService } from "../services/videoService";
-import { Bounce, toast } from "react-toastify";
+import { toasting } from "../utils/toast";
+import { Button, Form, Input, Modal } from "antd";
 
-export const UploadVideoModal = () => {
+// TODO: fix opening with old data
+export const UploadVideoModal = ({ isModalVisible, close }: { isModalVisible: boolean, close: (event: FormEvent) => void}) => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [video, setVideo] = useState(null);
+  const [okText, setOkText] = useState('Ok');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDescriptionChange = (event: any) => {
@@ -107,43 +109,31 @@ export const UploadVideoModal = () => {
     setTitle(event.target.files[0].name);
   };
 
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!video) {
-      toast.error("Please select a video.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
+      toasting.error("Please select a video.");
       return;
     }
 
-    // Change to progress
     setIsSubmitting(true);
+    setOkText("Uploading...");
 
     try {
-      console.log("TEST: submitting", video);
       const videoEl = document.createElement("video");
       videoEl.preload = "metadata";
 
       videoEl.onloadedmetadata = async function () {
         window.URL.revokeObjectURL(videoEl.src);
         const duration = videoEl.duration;
-        const res = await videosService.uploadVideo(
+        await videosService.uploadVideo(
           { title, description, video, duration },
           () => {}
         );
-  
-        console.log("TEST: response from upload", res);
+        setOkText("Uploaded!");
       };
       videoEl.src = URL.createObjectURL(video);
-
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to upload video.");
@@ -153,31 +143,71 @@ export const UploadVideoModal = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="description">Description:</label>
-        <input
-          type="text"
-          id="description"
-          name="description"
-          value={description}
-          onChange={handleDescriptionChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="video">Video file:</label>
-        <input
-          type="file"
-          id="video"
-          name="video"
-          accept="video/mp4"
-          onChange={handleVideoChange}
-        />
-      </div>
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Uploading..." : "Submit"}
-      </button>
-    </form>
+    <Modal
+      title="Title"
+      open={isModalVisible}
+      onCancel={close}
+      footer={[
+        <Button key="back" onClick={close}>
+          Close Form
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {okText}
+        </Button>,
+      ]}
+      destroyOnClose
+    >
+      <Form layout="vertical" onSubmitCapture={handleSubmit} preserve={false}>
+        <Form.Item label="Description:">
+          <Input
+            disabled={isSubmitting}
+            id="description"
+            name="description"
+            value={description}
+            onChange={handleDescriptionChange}
+          />
+        </Form.Item>
+        <Form.Item label="Video file:">
+          <input
+            disabled={isSubmitting}
+            type="file"
+            id="video"
+            name="video"
+            accept="video/mp4"
+            onChange={handleVideoChange}
+          />
+        </Form.Item>
+      </Form>
+      {/* <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="description">Description:</label>
+          <input
+            disabled={isSubmitting}
+            type="text"
+            id="description"
+            name="description"
+            value={description}
+            onChange={handleDescriptionChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="video">Video file:</label>
+          <input
+            disabled={isSubmitting}
+            type="file"
+            id="video"
+            name="video"
+            accept="video/mp4"
+            onChange={handleVideoChange}
+          />
+        </div>
+      </form> */}
+    </Modal>
   );
 };
 

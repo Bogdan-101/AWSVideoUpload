@@ -2,6 +2,7 @@ import { Context, APIGatewayProxyResult, APIGatewayEvent } from "aws-lambda";
 import { databaseService } from "../services/database.service";
 import { videosService } from "../services/videos.service";
 import { validateToken } from "../utils/user";
+import { CustomError } from "../utils/customError";
 
 export const handler = async (
   event: APIGatewayEvent,
@@ -30,11 +31,28 @@ export const handler = async (
       },
     };
   } catch (error) {
+    if (error instanceof CustomError) {
+      return {
+        statusCode: error.statusCode,
+        body: JSON.stringify({
+          message: error.message,
+        }),
+        headers: {
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+        },
+      };
+    }
+      console.log(
+        "An error appeared while processing the getVideoList request, see the logs.",
+        error
+      );
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: JSON.stringify({
-        message: "An error occureed",
-        error: error.message,
+        message:
+          "An error appeared while processing the getVideoList request, see the logs."
       }),
     };
   }

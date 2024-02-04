@@ -24,10 +24,6 @@ export const Header = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -74,14 +70,7 @@ export const Header = () => {
           </>
         )}
       </Space>
-      <Modal
-        title="Title"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <UploadVideoModal />
-      </Modal>
+      <UploadVideoModal isModalVisible={isModalVisible} close={handleCancel}/>
     </AntHeader>
   );
 };

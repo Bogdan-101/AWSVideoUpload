@@ -1,4 +1,4 @@
-import { Col, Row, Typography } from "antd";
+import { Col, Row, Spin, Typography } from "antd";
 import { useVideos } from "../hooks/useVideos";
 import { VideoCard } from "../components/VideoCard";
 
@@ -8,7 +8,7 @@ export const Videos = () => {
   if (error) return <Typography color="red">{error}</Typography>;
   if (isLoading)
     return (
-      <div>loading</div>
+      <Spin spinning/>
     );
   if (!isLoading && !videos.length) {
     return (
