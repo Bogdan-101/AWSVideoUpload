@@ -6,12 +6,12 @@ import { VideoGallery } from "../components/VideoGallery";
 export const Videos = () => {
   return (
     <>
-      <Tabs defaultActiveKey="1">
+      <Tabs defaultActiveKey="1" destroyInactiveTabPane>
         <TabPane tab="Upload" key="1">
           <UploadVideoModal />
         </TabPane>
         <TabPane tab="Your Videos" key="2">
-          <VideoGallery />
+          <VideoGallery/>
         </TabPane>
       </Tabs>
     </>

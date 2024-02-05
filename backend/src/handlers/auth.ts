@@ -55,7 +55,7 @@ export const handler = async (
         error
       );
     return {
-      statusCode: 5090,
+      statusCode: 500,
       body: JSON.stringify({
         message: "An error appeared while processing the auth request, see the logs.",
       }),

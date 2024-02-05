@@ -1,15 +1,12 @@
-import React from "react";
-import { Button, Layout, Space, Modal, FlexProps } from "antd";
+import { Button, Layout, Space } from "antd";
 import {
   ArrowRightOutlined,
   HomeFilled,
   LoginOutlined,
-  PlusCircleFilled,
   UserAddOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
-import { UploadVideoModal } from "./UploadVideo";
 
 // import { UploadModal } from "./UploadModal";
 
@@ -39,20 +36,11 @@ export const Header = () => {
         <Link to="/">
           <Button icon={<HomeFilled />}>Home</Button>
         </Link>
-        {user ? (
+        {user && (
           <>
             <Button onClick={logOut} icon={<ArrowRightOutlined />}>
               Logout
             </Button>
-          </>
-        ) : (
-          <>
-            <Link to="/signup">
-              <Button icon={<UserAddOutlined />}>Create Account</Button>
-            </Link>
-            <Link to="/login">
-              <Button icon={<LoginOutlined />}>Login</Button>
-            </Link>
           </>
         )}
       </Space>
