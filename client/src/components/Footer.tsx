@@ -6,7 +6,7 @@ export const Footer = () => (
   <Row justify="center" style={{ marginTop: "20px", marginBottom: "20px" }}>
     <Col>
       <Typography.Link
-        href="https://github.com/Bogdan-101"
+        href="https://github.com/Bogdan-101/AWSVideoUpload"
         target="_blank"
         rel="noopener noreferrer"
       >

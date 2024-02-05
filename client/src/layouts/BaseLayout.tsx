@@ -5,7 +5,6 @@ import { Header } from "../components/Header";
 
 const { Header: AntHeader, Footer: AntFooter, Content } = Layout;
 
-// TODO: remove null children here
 export const BaseLayout = ({
   children,
   ...rest

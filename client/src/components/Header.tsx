@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
-import { UploadVideoModal } from "./UploadVideoModal";
+import { UploadVideoModal } from "./UploadVideo";
 
 // import { UploadModal } from "./UploadModal";
 
@@ -18,15 +18,6 @@ const { Header: AntHeader } = Layout;
 export const Header = () => {
   const navigate = useNavigate();
   const user = useUser();
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const logOut = () => {
     localStorage.removeItem("token");
@@ -46,15 +37,10 @@ export const Header = () => {
 
       <Space size="middle">
         <Link to="/">
-          <Button icon={<HomeFilled />}>
-          Home
-        </Button>
+          <Button icon={<HomeFilled />}>Home</Button>
         </Link>
         {user ? (
           <>
-            <Button onClick={showModal} icon={<PlusCircleFilled />}>
-              Upload
-            </Button>
             <Button onClick={logOut} icon={<ArrowRightOutlined />}>
               Logout
             </Button>
@@ -70,7 +56,6 @@ export const Header = () => {
           </>
         )}
       </Space>
-      <UploadVideoModal isModalVisible={isModalVisible} close={handleCancel}/>
     </AntHeader>
   );
 };

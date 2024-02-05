@@ -90,10 +90,10 @@
 import React, { FormEvent, useState } from "react";
 import { videosService } from "../services/videoService";
 import { toasting } from "../utils/toast";
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Form, Input } from "antd";
 
 // TODO: fix opening with old data
-export const UploadVideoModal = ({ isModalVisible, close }: { isModalVisible: boolean, close: (event: FormEvent) => void}) => {
+export const UploadVideoModal = () => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [video, setVideo] = useState(null);
@@ -143,25 +143,6 @@ export const UploadVideoModal = ({ isModalVisible, close }: { isModalVisible: bo
   };
 
   return (
-    <Modal
-      title="Title"
-      open={isModalVisible}
-      onCancel={close}
-      footer={[
-        <Button key="back" onClick={close}>
-          Close Form
-        </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {okText}
-        </Button>,
-      ]}
-      destroyOnClose
-    >
       <Form layout="vertical" onSubmitCapture={handleSubmit} preserve={false}>
         <Form.Item label="Description:">
           <Input
@@ -182,33 +163,40 @@ export const UploadVideoModal = ({ isModalVisible, close }: { isModalVisible: bo
             onChange={handleVideoChange}
           />
         </Form.Item>
+        <Button
+          key="submit"
+          type="primary"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {okText}
+        </Button>
       </Form>
-      {/* <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="description">Description:</label>
-          <input
-            disabled={isSubmitting}
-            type="text"
-            id="description"
-            name="description"
-            value={description}
-            onChange={handleDescriptionChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="video">Video file:</label>
-          <input
-            disabled={isSubmitting}
-            type="file"
-            id="video"
-            name="video"
-            accept="video/mp4"
-            onChange={handleVideoChange}
-          />
-        </div>
-      </form> */}
-    </Modal>
   );
 };
+{/* <form onSubmit={handleSubmit}>
+  <div>
+    <label htmlFor="description">Description:</label>
+    <input
+      disabled={isSubmitting}
+      type="text"
+      id="description"
+      name="description"
+      value={description}
+      onChange={handleDescriptionChange}
+    />
+  </div>
+  <div>
+    <label htmlFor="video">Video file:</label>
+    <input
+      disabled={isSubmitting}
+      type="file"
+      id="video"
+      name="video"
+      accept="video/mp4"
+      onChange={handleVideoChange}
+    />
+  </div>
+</form> */}
 
 export default UploadVideoModal;
