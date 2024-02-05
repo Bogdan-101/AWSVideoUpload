@@ -1,18 +1,42 @@
-import { Card } from "antd";
-import { DeleteFilled } from "@ant-design/icons";
+import { Card, Modal, Spin } from "antd";
+import { DeleteFilled, LoadingOutlined } from "@ant-design/icons";
 import { Video, videosService } from "../services/videoService";
+import { useState } from "react";
 
-export const VideoCard = ({ video, onDelete }: {video: Video, onDelete: (id: string) => void}) => {
+export const VideoCard = ({ video, onDelete }: { video: Video, onDelete: (id: string) => void }) => {
+  const [isLoading, setIsLoading] = useState(false); // State to track loading
 
-  const handleDelete = async() => {
-    await videosService.deleteVideo(video.id);
-    onDelete(video.id);
-  }
+  const showDeleteConfirm = () => {
+    Modal.confirm({
+      title: "Are you sure delete this video?",
+      content: "This action cannot be undone",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        handleDelete();
+      },
+    });
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await videosService.deleteVideo(video.id);
+      onDelete(video.id);
+    } catch (error) {
+      console.error("Failed to delete video:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   return (
     <Card
       hoverable
-      style={{ width: 240 }}
+      style={{ width: 240, opacity: isLoading ? 0.5 : 1  }}
       cover={
         <video
           style={{ objectFit: "cover" }}
@@ -23,7 +47,13 @@ export const VideoCard = ({ video, onDelete }: {video: Video, onDelete: (id: str
           Your browser does not support the video tag.
         </video>
       }
-      actions={[<DeleteFilled key="delete" onClick={handleDelete} />]}
+      actions={[
+        isLoading ? (
+          <Spin indicator={antIcon} />
+        ) : (
+          <DeleteFilled key="delete" onClick={showDeleteConfirm} />
+        ),
+      ]}
     >
       <Card.Meta title={video.name} description={video.description} />
       <Card.Meta title={"Hosted on"} description={video.url} />

@@ -92,7 +92,6 @@ import { videosService } from "../services/videoService";
 import { toasting } from "../utils/toast";
 import { Button, Form, Input } from "antd";
 
-// TODO: fix opening with old data
 export const UploadVideoModal = () => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
@@ -128,8 +127,7 @@ export const UploadVideoModal = () => {
         window.URL.revokeObjectURL(videoEl.src);
         const duration = videoEl.duration;
         await videosService.uploadVideo(
-          { title, description, video, duration },
-          () => {}
+          { title, description, video, duration }
         );
         setOkText("Uploaded!");
       };
@@ -174,29 +172,5 @@ export const UploadVideoModal = () => {
       </Form>
   );
 };
-{/* <form onSubmit={handleSubmit}>
-  <div>
-    <label htmlFor="description">Description:</label>
-    <input
-      disabled={isSubmitting}
-      type="text"
-      id="description"
-      name="description"
-      value={description}
-      onChange={handleDescriptionChange}
-    />
-  </div>
-  <div>
-    <label htmlFor="video">Video file:</label>
-    <input
-      disabled={isSubmitting}
-      type="file"
-      id="video"
-      name="video"
-      accept="video/mp4"
-      onChange={handleVideoChange}
-    />
-  </div>
-</form> */}
 
 export default UploadVideoModal;

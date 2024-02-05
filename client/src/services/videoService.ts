@@ -1,6 +1,4 @@
 import axios, { Axios } from "axios";
-import { Dispatch, SetStateAction } from "react";
-import { Bounce, toast } from "react-toastify";
 import { toasting } from "../utils/toast";
 
 export interface Video {
@@ -41,9 +39,7 @@ class VideosService {
     return data;
   }
 
-  // TODO: check setProgess type here
-  async uploadVideo({ title, description, video, duration }: VideoFormValues, setProgress: { (value: SetStateAction<number>): void; (arg0: number): void; }) {
-    // TODO: add progress here
+  async uploadVideo({ title, description, video, duration }: VideoFormValues) {
     try {
       const uploadURL = await this.getPreSignedURL(
         title,
@@ -60,7 +56,6 @@ class VideosService {
       });
 
       if (response.ok) {
-        setProgress(100);
         toasting.success("Video is uploaded 🚀 Don't forget to re-fetch the videos!");
       } else {
         console.error("Upload failed", response);
