@@ -8,6 +8,7 @@ import * as schema from "../schema";
 import { and, eq } from "drizzle-orm";
 import { generatePasswordHash, verifyPassword } from "../utils/user";
 import * as jwt from 'jsonwebtoken';
+import { CustomError } from "../utils/customError";
 
 require("dotenv").config();
 
@@ -85,11 +86,11 @@ export class DatabaseService implements IDatabaseService {
     // TODO: move to the user service
     const existUser = await this.drizzle.query.users.findFirst({ where: eq(schema.users.username, user.username) });
     if (!existUser) {
-      throw new Error('User was not found');
+      throw new CustomError(400, 'User was not found');
     }
     const isAuth = await verifyPassword(user.password, existUser.passwordHash);
     if (!isAuth) {
-      throw new Error("Username or password do not match");
+      throw new CustomError(400, "Username or password do not match");
     }
 
     const token = jwt.sign(

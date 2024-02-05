@@ -24,7 +24,7 @@ export const LoginForm = ({ mode }: { mode: "login" | "signup" }) => {
       form.setFields([
         {
           name: "password",
-          errors: [errorMessage, JSON.stringify(e)],
+          errors: [errorMessage],
         },
       ]);
     }
